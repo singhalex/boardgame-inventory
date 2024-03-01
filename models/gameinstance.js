@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 const GameInstanceSchema = new Schema({
   game: { type: Schema.Types.ObjectId, ref: "Game", required: true },
   publisher: { type: String, required: true },
+  price: String,
   status: {
     type: String,
     required: true,
