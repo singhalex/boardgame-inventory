@@ -17,7 +17,7 @@ exports.genre_create_get = asyncHandler(async (req, res, next) => {
 });
 
 // Handle Genre create on POST
-exports.genre_greate_post = asyncHandler(async (req, res, next) => {
+exports.genre_create_post = asyncHandler(async (req, res, next) => {
   res.send("NOT IMPLEMENTED: Genre create POST");
 });
 

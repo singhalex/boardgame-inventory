@@ -27,7 +27,7 @@ exports.gameinstance_delete_get = asyncHandler(async (req, res, next) => {
 });
 
 // Handle GameInstance detel on POST
-exports.gameinstance_delete_get = asyncHandler(async (req, res, next) => {
+exports.gameinstance_delete_post = asyncHandler(async (req, res, next) => {
   res.send("NOT IMPLEMENTED: GameInstance delete POST");
 });
 

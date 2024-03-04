@@ -27,7 +27,7 @@ exports.desiger_delete_get = asyncHandler(async (req, res, next) => {
 });
 
 // Display Designer delete form on POST
-exports.designer_delete_get = asyncHandler(async (req, res, next) => {
+exports.designer_delete_post = asyncHandler(async (req, res, next) => {
   res.send("NOT IMPLEMENTED: Designer delete POST");
 });
 
@@ -37,6 +37,6 @@ exports.designer_update_get = asyncHandler(async (req, res, next) => {
 });
 
 // Display Designer update form on POST
-exports.designer_updated_post = asyncHandler(async (req, res, next) => {
+exports.designer_update_post = asyncHandler(async (req, res, next) => {
   res.send(`NOT IMPLEMENTED: Designer ${req.params.id} update POST`);
 });
