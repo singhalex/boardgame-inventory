@@ -6,8 +6,6 @@ const game_controller = require("../controllers/gameControllers");
 const designer_controller = require("../controllers/designerController");
 const genre_controller = require("../controllers/genreControllers");
 const game_instance_controller = require("../controllers/gameinstanceControllers");
-const genre = require("../models/genre");
-const gameinstance = require("../models/gameinstance");
 
 /// GAME ROUTES ///
 
