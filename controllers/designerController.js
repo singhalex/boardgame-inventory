@@ -1,4 +1,5 @@
 const Designer = require("../models/designer");
+const Game = require("../models/game");
 const asyncHandler = require("express-async-handler");
 
 // Display list of all designers
@@ -12,7 +13,21 @@ exports.designer_list = asyncHandler(async (req, res, next) => {
 
 // Display detail page for a specific designer
 exports.designer_detail = asyncHandler(async (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: Designer Detail - ${req.params.id}`);
+  const [designer, allGamesByDesigner] = await Promise.all([
+    Designer.findById(req.params.id).exec(),
+    Game.find({ designer: req.params.id }, "title description").find(),
+  ]);
+
+  if (designer === null) {
+    const err = "Designer not found";
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render("designer_detail", {
+    designer: designer,
+    designer_games: allGamesByDesigner,
+  });
 });
 
 // Display Designer create form on GET
