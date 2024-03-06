@@ -1,0 +1,35 @@
+extends layout 
+
+block content
+  h1=title
+
+  p #[strong #{game.designer.length > 1 ?  "Designers: " :  "Designer: "}]
+    each designer, index in game.designer
+      a(href=designer.url)
+        span #{designer.name}
+      | #{index < game.designer.length - 1 ? ' & ' : ''}
+  
+  img(src=game.image alt=`${game.title} box cover`)
+
+  p #[strong Description: ] #{game.description}
+  p #[strong Genre: ]
+    each val, index in game.genre
+      a(href=val.url)  #{val.name}
+       if index < game.genre.length - 1
+        |,&nbsp;
+
+  div(style='margin-left:20px;margin-top:20px')
+    h4 Copies
+
+    each game in game_instances 
+      hr
+      if game.status == 'In Stock'
+        p.text-success #{game.status}
+      else if game.status == 'Ordered'
+        p.text-warning #{game.status}
+      else
+        p.text-danger #{game.status}
+      p #[strong Publisher: ] #{game.publisher}
+      p #[strong Id: ]
+        a(href=game.url) #{game._id}
+

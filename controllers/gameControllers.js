@@ -4,6 +4,7 @@ const Genre = require("../models/genre");
 const GameInstance = require("../models/gameinstance");
 
 const asyncHandler = require("express-async-handler");
+const game = require("../models/game");
 
 exports.index = asyncHandler(async (req, res, next) => {
   const [
@@ -42,9 +43,24 @@ exports.game_list = asyncHandler(async (req, res, next) => {
 
 // Display detail page for a specific game
 exports.game_detail = asyncHandler(async (req, res, next) => {
-  // res.send(`NOT IMPLEMENTED: Game detail: ${req.params.id}`);
-  const game_detail = await Game.find({ _id: req.params.id }).exec();
-  res.send(game_detail[0].title);
+  const [game, gameInstances] = await Promise.all([
+    Game.findById(req.params.id).populate("designer").populate("genre").exec(),
+    GameInstance.find({ game: req.params.id }).exec(),
+  ]);
+
+  if (game === null) {
+    const err = new Error("Game not found");
+    err.status = 404;
+    return next(err);
+  }
+
+  console.log(game.designer[0].name);
+
+  res.render("game_detail", {
+    title: game.title,
+    game: game,
+    game_instances: gameInstances,
+  });
 });
 
 // Display game create form on GET
