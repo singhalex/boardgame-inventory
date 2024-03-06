@@ -1,0 +1,19 @@
+extends layout 
+
+block content 
+  h1=title 
+
+  if gameinstance_list.length 
+    ul 
+      each instance in gameinstance_list
+        li
+          a(href=instance.url) #{instance.game.title} : #{instance.publisher} -&nbsp;
+          if instance.status == 'In Stock'
+            span.text-success #{instance.status}
+          else if instance.status == 'Ordered'
+            span.text-warning #{instance.status}
+          else
+            span.text-danger #{instance.status}
+
+  else
+    p There are no game copies in store.

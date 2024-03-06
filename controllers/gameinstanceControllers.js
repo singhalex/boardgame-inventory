@@ -3,7 +3,15 @@ const asyncHandler = require("express-async-handler");
 
 // Display list of all GameInstances
 exports.gameinstance_list = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED:GameInstance List");
+  const allGameInstances = await GameInstance.find()
+    .populate("game")
+    .sort({ game: 1 })
+    .exec();
+
+  res.render("gameinstance_list", {
+    title: "Game Instance List",
+    gameinstance_list: allGameInstances,
+  });
 });
 
 // Display detail page for a specific GameInstance
