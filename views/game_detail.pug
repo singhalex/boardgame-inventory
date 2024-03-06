@@ -29,6 +29,7 @@ block content
         p.text-warning #{game.status}
       else
         p.text-danger #{game.status}
+      p #[strong Price: ] $#{game.price}
       p #[strong Publisher: ] #{game.publisher}
       p #[strong Id: ]
         a(href=game.url) #{game._id}
