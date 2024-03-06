@@ -1,0 +1,15 @@
+extends layout 
+
+block content 
+
+  h1= title
+
+  if game_list.length
+    ul 
+      each game in game_list
+        li
+          a(href=game.url) #{game.title} - 
+          each designer, index in game.designer
+            span #{designer.name} #{index < game.designer.length - 1 ? '& ': ''}
+  else
+    p There are no games.
