@@ -3,7 +3,11 @@ const asyncHandler = require("express-async-handler");
 
 // Display list of all designers
 exports.designer_list = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Designer List");
+  const allDesigners = await Designer.find().sort({ last_name: 1 }).exec();
+  res.render("designer_list", {
+    title: "Designer List",
+    designer_list: allDesigners,
+  });
 });
 
 // Display detail page for a specific designer

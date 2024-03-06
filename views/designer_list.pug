@@ -1,0 +1,12 @@
+extends layout 
+
+block content
+  h1=title
+
+  if designer_list.length 
+    ul 
+      each designer in designer_list 
+        li
+          a(href=designer.url) #{designer.name}
+  else
+    p There are no designers.
