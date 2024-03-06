@@ -1,0 +1,18 @@
+extends layout 
+
+block content 
+
+  h1 #{title} ID: #{gameInstance._id}
+
+  p #[strong Title: ]
+    a(href=gameInstance.game.url) #{gameInstance.game.title}
+  p #[strong Price: ] $#{gameInstance.price}
+  p #[strong Publisher:] #{gameInstance.publisher}
+
+  p #[strong Status: ]
+    if gameInstance.status == 'In Stock'
+      span.text-success #{gameInstance.status}
+    else if gameInstance.status == 'Ordered'
+      span.text-warning #{gameInstance.status}
+    else
+      span.text-danger #{gameInstance.status}
