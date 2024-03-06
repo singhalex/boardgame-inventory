@@ -1,4 +1,5 @@
 const Genre = require("../models/genre");
+const Game = require("../models/game");
 const asyncHandler = require("express-async-handler");
 
 // Display list of all Genre
@@ -13,7 +14,26 @@ exports.genre_list = asyncHandler(async (req, res, next) => {
 
 // Display detail list for a specific genre
 exports.genre_detail = asyncHandler(async (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: Genre detail: ${req.params.id}`);
+  const [genre, gamesInGenre] = await Promise.all([
+    Genre.findById(req.params.id).exec(),
+    Game.find({ genre: req.params.id }, "title description")
+      .sort({ title: 1 })
+      .exec(),
+  ]);
+
+  console.log(gamesInGenre);
+
+  if (genre === null) {
+    const err = new Error("Genre not found");
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render("genre_detail", {
+    title: "Genre Detail",
+    genre: genre,
+    genre_games: gamesInGenre,
+  });
 });
 
 // Display Genre create form on GET
