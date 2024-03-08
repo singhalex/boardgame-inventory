@@ -1,6 +1,7 @@
 const Designer = require("../models/designer");
 const Game = require("../models/game");
 const asyncHandler = require("express-async-handler");
+const { body, validationResult } = require("express-validator");
 
 // Display list of all designers
 exports.designer_list = asyncHandler(async (req, res, next) => {
@@ -32,13 +33,56 @@ exports.designer_detail = asyncHandler(async (req, res, next) => {
 
 // Display Designer create form on GET
 exports.designer_create_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Designer create GET");
+  res.render("designer_form", { title: "Create Designer" });
 });
 
 // Handle Designer create on POST
-exports.designer_create_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Designer create POST");
-});
+exports.designer_create_post = [
+  // Validate and sanitize fields
+  body("first_name")
+    .trim()
+    .isLength({ min: 1 })
+    .escape()
+    .withMessage("First name must be specified")
+    .isAlpha()
+    .withMessage("First name has non-alpha characters."),
+  body("last_name")
+    .trim()
+    .isLength({ min: 1 })
+    .escape()
+    .withMessage("Last name must be specified")
+    .isAlpha()
+    .withMessage("Last name has non-alpha characters."),
+
+  // Process request after validation and sanitization
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors and sanitation
+    const errors = validationResult(req);
+
+    // create Designer object with escaped and trimmed data
+    const designer = new Designer({
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render form again with sanitized & error msgs
+      res.render("designer_form", {
+        title: "Create Designer",
+        designer: designer,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      // Data from form is valid
+
+      //Save designer
+      await designer.save();
+      // Redirect to new designer detail
+      res.redirect(designer.url);
+    }
+  }),
+];
 
 // Display Designer delete form on GET
 exports.desiger_delete_get = asyncHandler(async (req, res, next) => {
