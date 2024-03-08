@@ -1,0 +1,42 @@
+extends layout 
+
+block content 
+
+  h1=title
+
+  form(method='POST')
+    div.form-group
+      label(for='title') Title: 
+      input#title.form-control(type='text', placeholder='Name of game' name='title' required value=(undefined===game ? '' : game.title))
+    div.form-group
+      label(for='image') Image URL:
+      input#image.form-control(type='text', placeholder='URL of image' name='image' required value=(undefined===game ? '' : game.image))
+    div.form-group
+      label Designer:
+      div 
+        for designer in designers 
+          div(style='display: inline; padding-right: 10px')
+            if designer.checked
+              input.checkbox-input(type='checkbox', name='designer', id=designer._id, value=designer._id, checked)
+            else
+              input.checkbox-input(type='checkbox', name='designer', id=designer._id, value=designer._id)
+            label(for=designer._id) &nbsp;#{designer.name}
+    div.form-group
+      label(for='description') Description: 
+      textarea#description.form-control(placeholder='Description' name='description' required)= undefined===game ? '' : game.description
+    div.form-group
+      label Genre: 
+      div 
+        for genre in genres 
+          div(style='display: inline; padding-right:10px')
+            if genre.checked 
+              input.checkbox-input(type='checkbox', name='genre', id=genre._id, value=genre._id, checked)
+            else 
+              input.checkbox-input(type='checkbox', name='genre', id=genre._id, value=genre._id)
+            label(for=genre._id) &nbsp;#{genre.name}
+    button.btn.btn-primary(type='submit') Submit
+
+  if errors 
+    ul 
+      for error in errors 
+        li!= error.msg
