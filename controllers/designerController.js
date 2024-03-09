@@ -86,12 +86,45 @@ exports.designer_create_post = [
 
 // Display Designer delete form on GET
 exports.desiger_delete_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Designer delete GET");
+  // Get details of author and all their books
+  const [designer, allGamesByDesigner] = await Promise.all([
+    Designer.findById(req.params.id).exec(),
+    Game.find({ designer: req.params.id }, "title description").exec(),
+  ]);
+
+  if (designer === null) {
+    // No results
+    res.redirect("/inventory/designers");
+  }
+
+  res.render("designer_delete", {
+    title: "Delete Designer",
+    designer: designer,
+    designer_games: allGamesByDesigner,
+  });
 });
 
 // Display Designer delete form on POST
 exports.designer_delete_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Designer delete POST");
+  // Get details of the designer and all their games
+  const [designer, allGamesByDesigner] = await Promise.all([
+    Designer.findById(req.params.id).exec(),
+    Game.find({ designer: req.params.id }, "title summary").exec(),
+  ]);
+
+  if (allGamesByDesigner.length > 0) {
+    // Designer has games. Render same as GET route
+    res.render("designer_delete", {
+      title: "Delete Designer",
+      designer: designer,
+      designer_books: allGamesByDesigner,
+    });
+    return;
+  } else {
+    // Designer has no books. Delete object and redirect to list of designers
+    await Designer.findByIdAndDelete(req.body.designerid);
+    res.redirect("/inventory/designers");
+  }
 });
 
 // Display Designer update form on GET
