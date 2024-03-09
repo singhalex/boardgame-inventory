@@ -61,7 +61,7 @@ exports.gameinstance_create_post = [
       require_decimal: true,
       digits_after_decimal: [2],
     })
-    .withMessage("Price must be a positive numeber in this format: 0.00"),
+    .withMessage("Price must be a positive number in this format: 0.00"),
   body("publisher", "Publisher must be specified.")
     .trim()
     .isLength({ min: 1 })
