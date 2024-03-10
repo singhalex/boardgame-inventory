@@ -33,4 +33,8 @@ block content
       p #[strong Publisher: ] #{game.publisher}
       p #[strong Id: ]
         a(href=game.url) #{game._id}
+  
+  hr
+  p
+    a(href=game.url+'/delete') Delete game
 
