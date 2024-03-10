@@ -89,6 +89,11 @@ exports.genre_delete_get = asyncHandler(async (req, res, next) => {
     Game.find({ genre: req.params.id }, "title description"),
   ]);
 
+  if (genre === null) {
+    // No results so render genre list
+    res.render("/inventory/genres");
+  }
+
   res.render("genre_delete", {
     title: "Delete Genre",
     genre: genre,
