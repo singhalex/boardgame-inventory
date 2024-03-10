@@ -2,6 +2,7 @@ const GameInstance = require("../models/gameinstance");
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
 const Game = require("../models/game");
+const game = require("../models/game");
 
 // Display list of all GameInstances
 exports.gameinstance_list = asyncHandler(async (req, res, next) => {
@@ -107,12 +108,29 @@ exports.gameinstance_create_post = [
 
 // Display GameInstance delete form on GET
 exports.gameinstance_delete_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: GameInstance delete GET");
+  const gameInstance = await GameInstance.findById(req.params.id).populate(
+    "game"
+  );
+
+  if (gameInstance === null) {
+    // No results
+    res.redirect("/inventory/gameinstances");
+  }
+
+  res.render("gameinstance_delete", {
+    title: "Delete Game Instance",
+    gameInstance: gameInstance,
+  });
 });
 
 // Handle GameInstance detel on POST
 exports.gameinstance_delete_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: GameInstance delete POST");
+  const gameInstance = await GameInstance.findById(req.params.id).populate(
+    "game"
+  );
+  // Delete instance and redirect to game detail page
+  await GameInstance.findByIdAndDelete(req.params.id);
+  res.redirect(gameInstance.game.url);
 });
 
 // Display GameInstance update form on GET
