@@ -104,7 +104,7 @@ router.post(
 
 // GET request to delete Game Instance
 router.get(
-  "/gameinstanc/:id/delete",
+  "/gameinstance/:id/delete",
   game_instance_controller.gameinstance_delete_get
 );
 
