@@ -2,6 +2,7 @@ const Genre = require("../models/genre");
 const Game = require("../models/game");
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
+const designer = require("../models/designer");
 
 // Display list of all Genre
 exports.genre_list = asyncHandler(async (req, res, next) => {
@@ -21,8 +22,6 @@ exports.genre_detail = asyncHandler(async (req, res, next) => {
       .sort({ title: 1 })
       .exec(),
   ]);
-
-  console.log(gamesInGenre);
 
   if (genre === null) {
     const err = new Error("Genre not found");
@@ -85,12 +84,39 @@ exports.genre_create_post = [
 
 // Display Genre delete form on GET
 exports.genre_delete_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Genre delete GET");
+  const [genre, allGamesInGenre] = await Promise.all([
+    Genre.findById(req.params.id).exec(),
+    Game.find({ genre: req.params.id }, "title description"),
+  ]);
+
+  res.render("genre_delete", {
+    title: "Delete Genre",
+    genre: genre,
+    genre_games: allGamesInGenre,
+  });
 });
 
 // Handle Genre delete on POST
 exports.genre_delete_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Genre delete POST");
+  // Get details of the genre and all its games
+  const [genre, allGamesInGenre] = await Promise.all([
+    Genre.findById(req.params.id).exec(),
+    Game.find({ genre: req.params.id }, "title description").exec(),
+  ]);
+
+  if (allGamesInGenre.length > 0) {
+    // Genre has games. Render same as GET route
+    res.render("genre_delete", {
+      title: "Delete Genre",
+      genre: genre,
+      genre_games: allGamesInGenre,
+    });
+    return;
+  } else {
+    // Genre has no books. Delete object and redirect to the list of genres
+    await Genre.findByIdAndDelete(req.params.id);
+    res.redirect("/inventory/genres");
+  }
 });
 
 // Display Genre update form on GET

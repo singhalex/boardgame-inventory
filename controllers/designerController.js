@@ -86,7 +86,7 @@ exports.designer_create_post = [
 
 // Display Designer delete form on GET
 exports.desiger_delete_get = asyncHandler(async (req, res, next) => {
-  // Get details of author and all their books
+  // Get details of designer and all their books
   const [designer, allGamesByDesigner] = await Promise.all([
     Designer.findById(req.params.id).exec(),
     Game.find({ designer: req.params.id }, "title description").exec(),
@@ -109,7 +109,7 @@ exports.designer_delete_post = asyncHandler(async (req, res, next) => {
   // Get details of the designer and all their games
   const [designer, allGamesByDesigner] = await Promise.all([
     Designer.findById(req.params.id).exec(),
-    Game.find({ designer: req.params.id }, "title summary").exec(),
+    Game.find({ designer: req.params.id }, "title description").exec(),
   ]);
 
   if (allGamesByDesigner.length > 0) {
