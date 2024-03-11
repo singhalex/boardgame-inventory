@@ -235,8 +235,6 @@ exports.game_update_get = asyncHandler(async (req, res, next) => {
     Genre.find().sort({ name: 1 }).exec(),
   ]);
 
-  console.log(game.designer);
-
   if (game === null) {
     // No results
     const err = new Error("Game not found");
