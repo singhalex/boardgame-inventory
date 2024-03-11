@@ -13,8 +13,10 @@ var app = express();
 // Set up mongoose connection
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", false);
-const mongoDB =
+
+const dev_db_url =
   "mongodb+srv://singhkalex:ZQXlnWE1qsgByczY@cluster0.huyjnn8.mongodb.net/board_game_inventory?retryWrites=true&w=majority&appName=Cluster0";
+const mongoDB = process.env.MONGODB_URI || dev_db_url;
 
 async function main() {
   await mongoose.connect(mongoDB);
