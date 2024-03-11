@@ -223,7 +223,6 @@ exports.game_delete_post = asyncHandler(async (req, res, next) => {
     await Game.findByIdAndDelete(req.body.gameid);
     res.redirect("/inventory/games");
   }
-  res.send("NOT IMPLEMENTED: Game delete POST");
 });
 
 // Display game update form on GET
