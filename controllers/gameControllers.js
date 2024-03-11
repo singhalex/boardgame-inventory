@@ -190,11 +190,39 @@ exports.game_create_post = [
 
 // Display game delete form on GET
 exports.game_delete_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Game delete GET");
+  const [game, allInstancesOfGame] = await Promise.all([
+    Game.findById(req.params.id).exec(),
+    GameInstance.find({ game: req.params.id }).exec(),
+  ]);
+
+  res.render("game_delete", {
+    title: "Delete Game",
+    game: game,
+    game_instances: allInstancesOfGame,
+  });
 });
 
 // Handle game delete on POST
 exports.game_delete_post = asyncHandler(async (req, res, next) => {
+  // Get details of the game and all its instances
+  const [game, allInstancesOfGame] = await Promise.all([
+    Game.findById(req.params.id).exec(),
+    Genre.find({ game: req.params.id }).exec(),
+  ]);
+
+  if (allInstancesOfGame.length > 0) {
+    // Game has game instances. Render same as GET route
+    res.render("game_delete", {
+      title: "Delete Game",
+      game: game,
+      game_instances: allInstancesOfGame,
+    });
+    return;
+  } else {
+    // Game has no instances. Delete object and redirect to the list of games
+    await Game.findByIdAndDelete(req.body.gameid);
+    res.redirect("/inventory/games");
+  }
   res.send("NOT IMPLEMENTED: Game delete POST");
 });
 
