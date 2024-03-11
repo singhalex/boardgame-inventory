@@ -6,6 +6,7 @@ const { body, validationResult } = require("express-validator");
 
 const asyncHandler = require("express-async-handler");
 const game = require("../models/game");
+const genre = require("../models/genre");
 
 exports.index = asyncHandler(async (req, res, next) => {
   const [
@@ -181,7 +182,7 @@ exports.game_create_post = [
         errors: errors.array(),
       });
     } else {
-      // Date from form is valid. Save game
+      // Data from form is valid. Save game
       await game.save();
       res.redirect(game.url);
     }
@@ -227,10 +228,149 @@ exports.game_delete_post = asyncHandler(async (req, res, next) => {
 
 // Display game update form on GET
 exports.game_update_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Game update GET");
+  // Get game, designers, and genres for form
+  const [game, allDesigners, allGenres] = await Promise.all([
+    Game.findById(req.params.id).exec(),
+    Designer.find().sort({ last_name: 1 }).exec(),
+    Genre.find().sort({ name: 1 }).exec(),
+  ]);
+
+  console.log(game.designer);
+
+  if (game === null) {
+    // No results
+    const err = new Error("Game not found");
+    err.status = 404;
+    return next(err);
+  }
+
+  // Mark selected designers as checked
+  allDesigners.forEach((designer) => {
+    if (game.designer.includes(designer._id)) designer.checked = "true";
+  });
+
+  // Mark selected genres as checked
+  allGenres.forEach((genre) => {
+    if (game.genre.includes(genre._id)) genre.checked = "true";
+  });
+
+  res.render("game_form", {
+    title: "Update Game",
+    designers: allDesigners,
+    genres: allGenres,
+    game: game,
+  });
 });
 
 // Handle game update on POST
-exports.game_update_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Game update POST");
-});
+exports.game_update_post = [
+  // Convert the designers to an array
+  (req, res, next) => {
+    if (!Array.isArray(req.body.designer)) {
+      typeof req.body.designer === "undefined" ? [] : [req.body.designer];
+    }
+    next();
+  },
+  // Convert the genre to an array
+  (req, res, next) => {
+    if (!Array.isArray(req.body.genre)) {
+      req.body.genre =
+        typeof req.body.genre === "undefined" ? [] : [req.body.genre];
+    }
+    next();
+  },
+
+  // Validate and sanitize fields
+  body("title", "Title must not be empty.")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("image")
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("URL must not be empty")
+    .isURL()
+    .withMessage("Must enter a valid URL."),
+  body("designer.*").escape(),
+  body("description", "Description must not be empty.")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("genre.*").escape(),
+
+  // Process request after validation and sanitization
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from the request
+    const errors = validationResult(req);
+    if (req.body.genre.length == 0) {
+      errors.errors.push({
+        type: "field",
+        value: "",
+        msg: "Must select at least one genre",
+        path: "genre",
+        location: "body",
+      });
+    }
+    if (req.body.length == 0) {
+      errors.erros.push({
+        type: "field",
+        value: "",
+        msg: "Must select at least one designer.",
+        path: "designer",
+        location: "body",
+      });
+    }
+
+    // Create a game object with the escaped and trimmed data
+    const game = new Game({
+      title: req.body.title,
+      designer: req.body.designer,
+      description: req.body.description,
+      image: req.body.image,
+      genre: req.body.genre,
+      _id: req.params.id,
+    });
+
+    if (
+      !errors.isEmpty() ||
+      req.body.genre.length === 0 ||
+      req.body.designer.length === 0
+    ) {
+      // There are errors. Render form again with the sanitized values and error msgs
+
+      // Get all designers and genres for form
+      const [allDesigners, allGenres] = await Promise.all([
+        Designer.find().sort({ last_name: 1 }).exec(),
+        Genre.find().sort({ name: 1 }).exec(),
+      ]);
+
+      // Mark selected designers as checked
+      for (const designer of allDesigners) {
+        if (game.designer.includes(designer._id)) {
+          designer.checked = "true";
+        }
+      }
+
+      // Mark selected genres as checked
+      for (const genre of allGenres) {
+        if (game.genre.includes(genre._id)) {
+          genre.checked = "true";
+        }
+      }
+
+      res.render("game_form", {
+        title: "Update Game",
+        designers: allDesigners,
+        genres: allGenres,
+        game: game,
+        errors: errors.array(),
+      });
+    } else {
+      // Data from form is valid. Update game
+      const updatedGame = await Game.findByIdAndUpdate(req.params.id, game, {});
+
+      // Redirect to updated game detail page
+      res.redirect(updatedGame.url);
+    }
+  }),
+];
