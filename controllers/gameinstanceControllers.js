@@ -129,7 +129,7 @@ exports.gameinstance_delete_post = asyncHandler(async (req, res, next) => {
     "game"
   );
   // Delete instance and redirect to game detail page
-  await GameInstance.findByIdAndDelete(req.params.id);
+  await GameInstance.findByIdAndDelete(req.body.gameInstanceid);
   res.redirect(gameInstance.game.url);
 });
 
