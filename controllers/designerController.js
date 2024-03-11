@@ -129,10 +129,64 @@ exports.designer_delete_post = asyncHandler(async (req, res, next) => {
 
 // Display Designer update form on GET
 exports.designer_update_get = asyncHandler(async (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: Designer ${req.params.id} update GET`);
+  const designer = await Designer.findById(req.params.id);
+
+  if (designer === null) {
+    const err = new Error("Designer not found");
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render("designer_form", {
+    title: "Update Designer",
+    designer: designer,
+  });
 });
 
 // Display Designer update form on POST
-exports.designer_update_post = asyncHandler(async (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: Designer ${req.params.id} update POST`);
-});
+exports.designer_update_post = [
+  // Validate and sanitize fields
+  body("first_name")
+    .trim()
+    .isLength({ min: 1 })
+    .escape()
+    .withMessage("First name must be specified")
+    .isAlpha()
+    .withMessage("First name has non-alpha characters."),
+  body("last_name")
+    .trim()
+    .isLength({ min: 1 })
+    .escape()
+    .withMessage("Last name must be specified")
+    .isAlpha()
+    .withMessage("Last name has non-alpha characters."),
+
+  // Process request after validation and sanitization
+  asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+    const designer = new Designer({
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+      _id: req.params.id,
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render form again with error msgs
+      res.render("designer_form", {
+        title: "Update Designer",
+        designer: designer,
+        errors: errors.array(),
+      });
+    } else {
+      // Form data is valid. Update designer
+      const updatedDesigner = await Designer.findByIdAndUpdate(
+        req.params.id,
+        designer,
+        {}
+      );
+
+      // Redirect to update designer detail page
+      res.redirect(updatedDesigner.url);
+    }
+  }),
+];
