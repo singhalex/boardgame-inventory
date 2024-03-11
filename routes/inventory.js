@@ -80,7 +80,7 @@ router.post("/genre/:id/delete", genre_controller.genre_delete_post);
 router.get("/genre/:id/update", genre_controller.genre_update_get);
 
 // POST request to update Genre
-router.get("/genre/:id/update", genre_controller.genre_update_post);
+router.post("/genre/:id/update", genre_controller.genre_update_post);
 
 // GET request for specific Genre
 router.get("/genre/:id", genre_controller.genre_detail);
