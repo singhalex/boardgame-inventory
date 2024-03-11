@@ -150,6 +150,7 @@ exports.gameinstance_update_get = asyncHandler(async (req, res, next) => {
   res.render("gameinstance_form", {
     title: "Update Game Instance",
     gameinstance: gameInstance,
+    selected_game: gameInstance.game._id,
     game_list: allGames,
   });
 });
@@ -201,6 +202,7 @@ exports.gameinstance_update_post = [
       res.render("gameinstance_form", {
         title: "Update Game Instance",
         gameinstance: gameInstance,
+        selected_game: gameInstance.game._id,
         game_list: allGames,
         errors: errors.array(),
       });
