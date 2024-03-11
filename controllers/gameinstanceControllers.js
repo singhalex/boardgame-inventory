@@ -135,10 +135,83 @@ exports.gameinstance_delete_post = asyncHandler(async (req, res, next) => {
 
 // Display GameInstance update form on GET
 exports.gameinstance_update_get = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: GameInstance update GET");
+  //
+  const [gameInstance, allGames] = await Promise.all([
+    GameInstance.findById(req.params.id),
+    Game.find({}, "title").sort({ title: 1 }).exec(),
+  ]);
+
+  if (gameInstance === null) {
+    const err = new Error("Game instance not found");
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render("gameinstance_form", {
+    title: "Update Game Instance",
+    gameinstance: gameInstance,
+    game_list: allGames,
+  });
 });
 
 // Handle GameInstance update on POST
-exports.gameinstance_update_post = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: GameInstance update POST");
-});
+exports.gameinstance_update_post = [
+  // Validate and sanitize the form data
+  body("game", "Game must be specified.").trim().isLength({ min: 1 }).escape(),
+  body("price")
+    .trim()
+    .isLength({ min: 1 })
+    .escape()
+    .withMessage("Price must be specified.")
+    .isCurrency({
+      require_symbol: false,
+      allow_negatives: false,
+      decimal_separator: ".",
+      require_decimal: true,
+      digits_after_decimal: [2],
+    })
+    .withMessage("Price must be a positive number in this format: 0.00"),
+  body("publisher", "Publisher must be specified.")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("status", "Status must be specified.")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+
+  // Process request after validation and sanitization
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from request
+    const errors = validationResult(req);
+
+    // Create Gameinstance object with the escaped and trimmed data
+    const gameInstance = new GameInstance({
+      game: req.body.game,
+      publisher: req.body.publisher,
+      price: req.body.price,
+      status: req.body.status,
+      _id: req.params.id,
+    });
+
+    const allGames = await Game.find({}, "title").sort({ title: 1 }).exec();
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render the form again with the sanitized values and error msgs
+      res.render("gameinstance_form", {
+        title: "Update Game Instance",
+        gameinstance: gameInstance,
+        game_list: allGames,
+        errors: errors.array(),
+      });
+    } else {
+      const updatedGameInstance = await GameInstance.findByIdAndUpdate(
+        req.params.id,
+        gameInstance,
+        {}
+      );
+
+      res.redirect(updatedGameInstance.url);
+    }
+  }),
+];

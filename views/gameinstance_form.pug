@@ -9,7 +9,7 @@ block content
       select#game.form-control(name='game' required)
         option(value='') --Select a Game--
         for game in game_list 
-          if selected_game==game._id.toString()
+          if gameinstance.game==game._id.toString()
             option(value=game._id, selected) #{game.title}
           else 
             option(value=game._id) #{game.title}
