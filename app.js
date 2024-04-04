@@ -12,6 +12,8 @@ const helmet = require("helmet");
 
 var app = express();
 
+require("dotenv").config();
+
 // Set up rate limiter
 const RateLimit = require("express-rate-limit");
 const limiter = RateLimit({
@@ -24,9 +26,7 @@ app.use(limiter);
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", false);
 
-const dev_db_url =
-  "mongodb+srv://singhkalex:ZQXlnWE1qsgByczY@cluster0.huyjnn8.mongodb.net/board_game_inventory?retryWrites=true&w=majority&appName=Cluster0";
-const mongoDB = process.env.MONGODB_URI || dev_db_url;
+const mongoDB = process.env.MONGODB_URI;
 
 async function main() {
   await mongoose.connect(mongoDB);
